@@ -11,7 +11,7 @@ from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint, LearningRat
 from tensorflow.keras.callbacks import CSVLogger
 from tensorflow.keras.models import load_model
 
-from scores_losses import foc_tversky_loss, foc_tversky_loss_2, dice, dice_loss, dice_loss2, dice_liver, \
+from scores_losses import foc_tversky_loss, dice, dice_liver, \
     dice_bladder, dice_lungs, dice_kidneys, dice_bones
 from model import get_model
 from dataset_utils import get_DataGen
@@ -71,7 +71,8 @@ def train(learnrate, epochs, batch_size, chkpt_dir, tboard, logdir, old_model, s
                                                       'dice_kidneys': dice_kidneys,
                                                       'dice_bones': dice_bones})
     else:
-        model = get_model(img_size=img_size, num_classes=num_classes, batch_size=batch_size, num_layers=4, num_filters=12)
+        model = get_model(img_size=img_size, num_classes=num_classes, batch_size=batch_size, num_layers=4,
+                          num_filters=8)
         model.compile(optimizer=Adam(learning_rate=learnrate),
                       loss=foc_tversky_loss,
                       metrics=[dice, dice_liver, dice_bladder, dice_lungs, dice_kidneys,

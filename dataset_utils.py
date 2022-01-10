@@ -115,7 +115,7 @@ random.Random(1337).shuffle(input_img_paths)
 random.Random(1337).shuffle(target_img_paths)
 
 val_samples = len(input_img_paths) // 5
-cal_samples = 900
+cal_samples = 500
 
 train_input_img_paths = input_img_paths[:-val_samples]
 train_target_img_paths = target_img_paths[:-val_samples]

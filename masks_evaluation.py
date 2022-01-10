@@ -1,8 +1,4 @@
-import argparse
-
 import numpy as np
-import os
-import cv2
 
 n_liver = 0
 n_bladder = 0
@@ -11,6 +7,7 @@ n_kidneys = 0
 n_bones = 0
 
 divider = '------------------------------'
+
 
 def explode_img(img, num_classes=6):
     exploded = np.zeros(shape=img.shape + (num_classes,), dtype=np.uint8)
@@ -60,11 +57,10 @@ def dice_total(pred, true):
 
     return ((liver_w * dice_liver + bladder_w * dice_bladder + lungs_w * dice_lungs +
              kidneys_w * dice_kidneys + bones_w * dice_bones + 1) / (
-                        liver_w + bladder_w + lungs_w + kidneys_w + bones_w + 1)), dice_liver*liver_w, dice_bladder*bladder_w, dice_lungs*lungs_w, dice_kidneys*kidneys_w, dice_bones*bones_w
+                    liver_w + bladder_w + lungs_w + kidneys_w + bones_w + 1)), dice_liver * liver_w, dice_bladder * bladder_w, dice_lungs * lungs_w, dice_kidneys * kidneys_w, dice_bones * bones_w
 
 
 def evaluate_results(list_pred, list_true):
-
     dices = []
     dice = 0
     dice_liver_total = 0
@@ -97,33 +93,15 @@ def evaluate_results(list_pred, list_true):
     global n_kidneys
     global n_bones
 
-    print('Weighted Mean on organs: ', (dice_liver_total + dice_bladder_total + dice_lungs_total + dice_kidneys_total + dice_bones_total)/(n_liver+n_bladder+n_lungs+n_kidneys+n_bones))
+    print('Weighted Mean on organs: ',
+          (dice_liver_total + dice_bladder_total + dice_lungs_total + dice_kidneys_total + dice_bones_total) / (
+                      n_liver + n_bladder + n_lungs + n_kidneys + n_bones))
     print(divider)
 
     print('Organs Dices:')
-    print('Liver: ', dice_liver_total/n_liver)
-    print('Bladder: ', dice_bladder_total/n_bladder)
-    print('Lungs: ', dice_lungs_total/n_lungs)
-    print('Kidneys: ', dice_kidneys_total/n_kidneys)
-    print('Bones: ', dice_bones_total/n_bones)
+    print('Liver: ', dice_liver_total / n_liver)
+    print('Bladder: ', dice_bladder_total / n_bladder)
+    print('Lungs: ', dice_lungs_total / n_lungs)
+    print('Kidneys: ', dice_kidneys_total / n_kidneys)
+    print('Bones: ', dice_bones_total / n_bones)
     print(divider)
-
-
-def main():
-    # construct the argument parser and parse the arguments
-    ap = argparse.ArgumentParser()
-    ap.add_argument('-id', '--image_dir', type=str, default='predictions',
-                    help='Path to folder of images. Default is predictions')
-    ap.add_argument('-ld', '--label_dir', type=str, default='labels',
-                    help='Path to folder of labels. Default is labels')
-    args = ap.parse_args()
-
-    print('Command line options:')
-    print(' --image_dir : ', args.image_dir)
-    print(' --label_dir : ', args.label_dir)
-    print(divider)
-    evaluate_results(args.image_dir, args.label_dir)
-
-
-if __name__ == '__main__':
-    main()

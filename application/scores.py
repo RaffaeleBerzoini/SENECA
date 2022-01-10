@@ -94,6 +94,8 @@ def evaluate_results(dir_pred='predictions', dir_true='labels'):
         dice_kidneys_total += dice_kidneys
         dice_bones_total += dice_bones
         dice += current_dice
+        #if current_dice < 0.6:
+        #    print(list_pred[i], ':', current_dice)
 
         dices.append(current_dice)
     print(divider)

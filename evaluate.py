@@ -3,9 +3,9 @@ import tensorflow as tf
 import sys
 from dataset_utils import get_DataGen
 from tensorflow.keras.models import load_model
-from scores_losses import foc_tversky_loss, foc_tversky_loss_2, dice, dice_loss, dice_liver, dice_bladder, dice_lungs, \
+from scores_losses import foc_tversky_loss, dice, dice_liver, dice_bladder, dice_lungs, \
     dice_kidneys, dice_bones
-from scores import evaluate_results
+from masks_evaluation import evaluate_results
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:

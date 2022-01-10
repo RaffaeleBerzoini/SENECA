@@ -50,7 +50,7 @@ compile() {
             --model           build/quant_model/q_model.h5 \
             --arch            $ARCH \
             --output_dir      build/compiled_$TARGET \
-            --net_name        bionet
+            --net_name        unet
 }
 
 

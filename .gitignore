@@ -3,3 +3,5 @@ build/
 results/
 .idea/
 __pycache__/
+original_data/
+papers/
