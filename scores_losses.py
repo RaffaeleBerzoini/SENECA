@@ -125,12 +125,11 @@ def dice_bones(y_true, y_pred, smooth=1, num_class=5):
 
 # Weights have been extracted by counting how many pixels of each organ were present in the dataset
 def dice(y_true, y_pred, smooth=1):
-    return ((0.23212333520332026 * dice_liver(y_true, y_pred) + 0.04549370195613813 * dice_bladder(y_true,
-                                                                                                   y_pred) + 0.37348887454707363 * dice_lungs(
-        y_true, y_pred) + 0.05246318852416101 * dice_kidneys(y_true,
-                                                             y_pred) + 0.2964308997693069 * dice_bones(y_true,
-                                                                                                       y_pred)) / (
-                    0.23212333520332026 + 0.04549370195613813 + 0.37348887454707363 + 0.05246318852416101 + 0.2964308997693069))
+    return ((0.23212333520332026 * dice_liver(y_true, y_pred) + 0.04549370195613813 * dice_bladder(y_true, y_pred)
+             + 0.37348887454707363 * dice_lungs(y_true, y_pred) + 0.05246318852416101 * dice_kidneys(y_true, y_pred)
+             + 0.2964308997693069 * dice_bones(y_true, y_pred)) / (0.23212333520332026 + 0.04549370195613813 +
+                                                                   0.37348887454707363 + 0.05246318852416101 +
+                                                                   0.2964308997693069))
 
 
 def dice_loss(y_true, y_pred):

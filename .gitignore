@@ -1,7 +1,8 @@
 Tars-ng.zip
 build/
-results/
 .idea/
 __pycache__/
 original_data/
 papers/
+results/*
+!results/*.py

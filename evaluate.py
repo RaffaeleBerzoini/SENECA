@@ -1,6 +1,10 @@
 import argparse
+import time
+
 import tensorflow as tf
 import sys
+
+import dataset_utils
 from dataset_utils import get_DataGen
 from tensorflow.keras.models import load_model
 from scores_losses import foc_tversky_loss, dice, dice_liver, dice_bladder, dice_lungs, \
@@ -50,20 +54,22 @@ def main():
                                                    'dice_kidneys': dice_kidneys,
                                                    'dice_bones': dice_bones})
 
-    model.evaluate(get_DataGen(train=False, batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize), calibration=True))
+    model.evaluate(
+        get_DataGen(train=False, batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize), calibration=True))
 
-    datagen = get_DataGen(train=False, batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize), calibration=True)
+    datagen = get_DataGen(train=False, batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize),
+                          calibration=True)
     preds = []
     true = []
-    for i in range(900//args.batchsize):
+    for i in range(dataset_utils.cal_samples // args.batchsize):
         x, y = datagen.__getitem__(i)
         predictions = model.predict(x)
         for j in range(args.batchsize):
             preds.append(predictions[j])
             true.append(y[j])
 
-    print(len(preds))
-    print(len(true))
+
+    assert len(preds) == len(true)
 
     evaluate_results(preds, true)
 

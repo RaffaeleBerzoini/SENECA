@@ -12,6 +12,7 @@ n_bones = 0
 
 divider = '------------------------------'
 
+
 def explode_img(img, num_classes=6):
     exploded = np.zeros(shape=img.shape + (num_classes,), dtype=np.uint8)
     for i in range(num_classes):
@@ -60,7 +61,7 @@ def dice_total(pred, true):
 
     return ((liver_w * dice_liver + bladder_w * dice_bladder + lungs_w * dice_lungs +
              kidneys_w * dice_kidneys + bones_w * dice_bones + 1) / (
-                        liver_w + bladder_w + lungs_w + kidneys_w + bones_w + 1)), dice_liver*liver_w, dice_bladder*bladder_w, dice_lungs*lungs_w, dice_kidneys*kidneys_w, dice_bones*bones_w
+                    liver_w + bladder_w + lungs_w + kidneys_w + bones_w + 1)), dice_liver * liver_w, dice_bladder * bladder_w, dice_lungs * lungs_w, dice_kidneys * kidneys_w, dice_bones * bones_w
 
 
 def evaluate_results(dir_pred='predictions', dir_true='labels'):
@@ -77,24 +78,25 @@ def evaluate_results(dir_pred='predictions', dir_true='labels'):
 
     dices = []
     dice = 0
-    dice_liver_total = 0
-    dice_bladder_total = 0
-    dice_lungs_total = 0
-    dice_kidneys_total = 0
-    dice_bones_total = 0
+    dice_liver_total = []
+    dice_bladder_total = []
+    dice_lungs_total = []
+    dice_kidneys_total = []
+    dice_bones_total = []
     for i in range(len(list_pred)):
         pred = np.load(dir_pred + '/' + list_pred[i])
         true = cv2.imread(dir_true + '/' + list_true[i], 0)
         pred = prepare_prediction(pred)
         current_dice, dice_liver, dice_bladder, dice_lungs, dice_kidneys, dice_bones = dice_total(pred, true)
 
-        dice_liver_total += dice_liver
-        dice_bladder_total += dice_bladder
-        dice_lungs_total += dice_lungs
-        dice_kidneys_total += dice_kidneys
-        dice_bones_total += dice_bones
+        dice_liver_total.append(dice_liver)
+        dice_bladder_total.append(dice_bladder)
+        dice_lungs_total.append(dice_lungs)
+        dice_kidneys_total.append(dice_kidneys)
+        dice_bones_total.append(dice_bones)
         dice += current_dice
-        #if current_dice < 0.6:
+        dices.append(current_dice)
+        # if current_dice < 0.6:
         #    print(list_pred[i], ':', current_dice)
 
         dices.append(current_dice)
@@ -102,9 +104,8 @@ def evaluate_results(dir_pred='predictions', dir_true='labels'):
     print(list_true[0][:-4], '-', list_pred[0][:-4], ' : ', dices[0])
     print(list_true[i][:-4], '-', list_pred[i][:-4], ' : ', current_dice)
     print(divider)
-    n_of_predictions = len(list_pred)
     print('Global Dice:')
-    print('Mean on slices: ', dice / n_of_predictions)
+    print("Mean on slices: %.2f +- %.2f" % (np.mean(dices) * 100, np.std(dices) * 100))
 
     global n_liver
     global n_bladder
@@ -112,15 +113,22 @@ def evaluate_results(dir_pred='predictions', dir_true='labels'):
     global n_kidneys
     global n_bones
 
-    print('Weighted Mean on organs: ', (dice_liver_total + dice_bladder_total + dice_lungs_total + dice_kidneys_total + dice_bones_total)/(n_liver+n_bladder+n_lungs+n_kidneys+n_bones))
+    std_organs = ((np.std(dice_liver_total) + np.std(dice_bladder_total) + np.std(dice_lungs_total) +
+                   np.std(dice_kidneys_total) + np.std(dice_bones_total)) / (n_liver + n_bladder + n_lungs +
+                                                                             n_kidneys + n_bones))
+    print('Weighted Mean on organs: %.2f +- %.2f' % (
+        (np.sum(dice_liver_total) + np.sum(dice_bladder_total) + np.sum(dice_lungs_total) + np.sum(dice_kidneys_total)
+         + np.sum(dice_bones_total)) / (n_liver + n_bladder + n_lungs + n_kidneys + n_bones) * 100, std_organs * 100))
     print(divider)
 
     print('Organs Dices:')
-    print('Liver: ', dice_liver_total/n_liver)
-    print('Bladder: ', dice_bladder_total/n_bladder)
-    print('Lungs: ', dice_lungs_total/n_lungs)
-    print('Kidneys: ', dice_kidneys_total/n_kidneys)
-    print('Bones: ', dice_bones_total/n_bones)
+    print('Liver: %.2f +- %.2f' % (np.sum(dice_liver_total) / n_liver * 100, np.std(dice_liver_total) / n_liver * 100))
+    print('Bladder: %.2f +- %.2f' % (
+        np.sum(dice_bladder_total) / n_bladder * 100, np.std(dice_bladder_total) / n_bladder * 100))
+    print('Lungs: %.2f +- %.2f' % (np.sum(dice_lungs_total) / n_lungs * 100, np.std(dice_lungs_total) / n_lungs * 100))
+    print('Kidneys: %.2f +- %.2f' % (
+        np.sum(dice_kidneys_total) / n_kidneys * 100, np.std(dice_kidneys_total) / n_kidneys * 100))
+    print('Bones: %.2f +- %.2f' % (np.sum(dice_bones_total) / n_bones * 100, np.std(dice_bones_total) / n_bones * 100))
     print(divider)
 
 

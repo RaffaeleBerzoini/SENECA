@@ -75,7 +75,7 @@ if __name__ == '__main__':
     im_size = (256, 256)
     n_classes = 6
     batch_dim = 8
-    model = get_model(img_size=im_size, num_classes=n_classes, batch_size=batch_dim, num_layers=5, num_filters=22)
+    model = get_model(img_size=im_size, num_classes=n_classes, batch_size=batch_dim, num_layers=5, num_filters=16)
 
     print('\n' + DIVIDER)
     print(' Model Summary')
