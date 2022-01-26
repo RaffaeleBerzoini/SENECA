@@ -5,4 +5,6 @@ __pycache__/
 original_data/
 papers/
 results/*
-!results/*.py
+results/article_utilities/*
+!results/article_utilities/*.py
+results/article_utilities/predictions/
