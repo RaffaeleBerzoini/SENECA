@@ -84,15 +84,24 @@ def evaluate_results(dir_pred='predictions', dir_true='labels'):
     list_pred = sorted(list_pred)
     list_true = sorted(list_true)
 
-    # for pred, true in zip(list_pred[:2], list_true[:2]):
-    #     print(pred, '|', true)
-    # for pred, true in zip(list_pred[-2:], list_true[-2:]):
-    #     print(pred, '|', true)
+    for pred, true in zip(list_pred, list_true):
+        assert pred[5:-4] == true[:-4]
 
     metrics = [dice_single, sensitivity_single, specificity_single]
     metrics_labels = ['dice', 'sensitivity', 'specificity']
 
     for metric, metrics_label in zip(metrics, metrics_labels):
+        global n_liver
+        global n_bladder
+        global n_lungs
+        global n_kidneys
+        global n_bones
+
+        n_liver = 0
+        n_bladder = 0
+        n_lungs = 0
+        n_kidneys = 0
+        n_bones = 0
 
         scores = []
         score = 0
@@ -116,45 +125,34 @@ def evaluate_results(dir_pred='predictions', dir_true='labels'):
             score_bones_total.append(score_bones)
             score += current_score
             scores.append(current_score)
-            # if current_score < 0.6:
-            #    print(list_pred[i], ':', current_score)
 
             scores.append(current_score)
-        print(divider)
-        # print(list_true[0][:-4], '-', list_pred[0][:-4], ' : ', scores[0])
-        # print(list_true[-1][:-4], '-', list_pred[-1][:-4], ' : ', current_score)
+
         print(divider)
         print('Global ', metrics_label, ':')
         print("Mean on slices: %.2f +- %.2f" % (np.mean(scores) * 100, np.std(scores) * 100))
 
-        if metrics_label == metrics_labels[0]:
-            global n_liver
-            global n_bladder
-            global n_lungs
-            global n_kidneys
-            global n_bones
+        std_organs = ((np.std(score_liver_total) + np.std(score_bladder_total) + np.std(score_lungs_total) +
+                       np.std(score_kidneys_total) + np.std(score_bones_total)) / (n_liver + n_bladder + n_lungs +
+                                                                                   n_kidneys + n_bones))
+        print('Weighted Mean on organs: %.2f +- %.2f' % (
+            (np.sum(score_liver_total) + np.sum(score_bladder_total) + np.sum(score_lungs_total) + np.sum(
+                score_kidneys_total)
+             + np.sum(score_bones_total)) / (n_liver + n_bladder + n_lungs + n_kidneys + n_bones) * 100,
+            std_organs * 100))
+        print(divider)
 
-            std_organs = ((np.std(score_liver_total) + np.std(score_bladder_total) + np.std(score_lungs_total) +
-                           np.std(score_kidneys_total) + np.std(score_bones_total)) / (n_liver + n_bladder + n_lungs +
-                                                                                       n_kidneys + n_bones))
-            print('Weighted Mean on organs: %.2f +- %.2f' % (
-                (np.sum(score_liver_total) + np.sum(score_bladder_total) + np.sum(score_lungs_total) + np.sum(
-                    score_kidneys_total)
-                 + np.sum(score_bones_total)) / (n_liver + n_bladder + n_lungs + n_kidneys + n_bones) * 100,
-                std_organs * 100))
-            print(divider)
-
-            print('Organs ', metrics_label)
-            print('Liver: %.2f +- %.2f' % (
-                np.sum(score_liver_total) / n_liver * 100, np.std(score_liver_total) / n_liver * 100))
-            print('Bladder: %.2f +- %.2f' % (
-                np.sum(score_bladder_total) / n_bladder * 100, np.std(score_bladder_total) / n_bladder * 100))
-            print('Lungs: %.2f +- %.2f' % (
-                np.sum(score_lungs_total) / n_lungs * 100, np.std(score_lungs_total) / n_lungs * 100))
-            print('Kidneys: %.2f +- %.2f' % (
-                np.sum(score_kidneys_total) / n_kidneys * 100, np.std(score_kidneys_total) / n_kidneys * 100))
-            print('Bones: %.2f +- %.2f' % (
-                np.sum(score_bones_total) / n_bones * 100, np.std(score_bones_total) / n_bones * 100))
+        print('Organs ', metrics_label)
+        print('Liver: %.2f +- %.2f' % (
+            np.sum(score_liver_total) / n_liver * 100, np.std(score_liver_total) / n_liver * 100))
+        print('Bladder: %.2f +- %.2f' % (
+            np.sum(score_bladder_total) / n_bladder * 100, np.std(score_bladder_total) / n_bladder * 100))
+        print('Lungs: %.2f +- %.2f' % (
+            np.sum(score_lungs_total) / n_lungs * 100, np.std(score_lungs_total) / n_lungs * 100))
+        print('Kidneys: %.2f +- %.2f' % (
+            np.sum(score_kidneys_total) / n_kidneys * 100, np.std(score_kidneys_total) / n_kidneys * 100))
+        print('Bones: %.2f +- %.2f' % (
+            np.sum(score_bones_total) / n_bones * 100, np.std(score_bones_total) / n_bones * 100))
         print(divider)
 
 
