@@ -1,10 +1,11 @@
-Tars-ng.zip
 build/
+Tars-ng.zip
 .idea/
 __pycache__/
 original_data/
 papers/
-results/*
 results/article_utilities/*
 !results/article_utilities/*.py
 results/article_utilities/predictions/
+application/labels
+application/predictions
