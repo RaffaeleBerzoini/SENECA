@@ -1,9 +1,6 @@
 # Inference Acceleration of a Semantic Segmentation Algorithm on FPGA
 
 
-- ###  Raffaele Berzoini  ([@RaffaeleBerzoini](https://github.com/RaffaeleBerzoini)) <br> raffaele.berzoini@mail.polimi.it
-
-
 ## Setup 
 
 - Open a command prompt and execute:
