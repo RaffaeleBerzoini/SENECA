@@ -4,8 +4,6 @@ Tars-ng.zip
 __pycache__/
 original_data/
 papers/
-results/article_utilities/*
-!results/article_utilities/*.py
-results/article_utilities/predictions/
+results/article_utilities/
 application/labels
 application/predictions
