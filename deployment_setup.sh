@@ -1,6 +1,11 @@
 #!/bin/sh
 
-python prepare_fpga_images.py -s "$1" -nim "$2"
+# Script to prepare a target folder to be copied to the evaluation board
+#
+# The folder will contain a python script to run the compiled model on the FPGA,
+# a python script to evaluate performances, and two folders containing input and labels images
+
+python prepare_board_images.py -s "$1" -nim "$2"
 
 cp application/app_mt.py build/target/
 cp application/scores.py build/target/

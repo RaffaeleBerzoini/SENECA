@@ -30,7 +30,8 @@ DIVIDER = '-----------------------------------------'
 
 
 def main():
-    # construct the argument parser and parse the arguments
+    """Evaluate float model results using the same metrics adopted for FPGA evaluation (keras evaluate model is
+    cannot be used on the FPGA) """
     ap = argparse.ArgumentParser()
     ap.add_argument('-m', '--model', type=str, default='build/float_model/f_model.h5',
                     help='Full path of model to evaluate. Default is build/float_model/f_model.h5')

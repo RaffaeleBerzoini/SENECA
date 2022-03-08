@@ -63,6 +63,7 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
     img_size = (256, 256)
     num_classes = 6
 
+    """Loads float-model to continue training"""
     if old_model is not None:
         print('Loading old model...')
         model = load_model(old_model, custom_objects={'foc_tversky_loss': foc_tversky_loss, 'dice': dice,
@@ -79,8 +80,6 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
                       metrics=[dice, dice_liver, dice_bladder, dice_lungs, dice_kidneys,
                                dice_bones])
 
-    # If something wrong with next training i've moved .compile before .summary
-
     print('\n' + DIVIDER)
     print(' Model Summary')
     print(DIVIDER)
@@ -91,7 +90,7 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
     '''
     tf.data pipelines
     '''
-    # train and test folder
+    # train and validation batch-generators
     train_dataset = get_DataGen(train=True, batch_size=batch_size, img_size=img_size)
     val_dataset = get_DataGen(train=False, batch_size=batch_size, img_size=img_size)
 
@@ -100,12 +99,14 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
     '''
     tb_call = TensorBoard(log_dir=tboard)
 
+    # float-model saving during training
     chkpt_call = ModelCheckpoint(
         filepath=os.path.join(chkpt_dir, '{val_loss:.4f}-f_model.h5'),
         monitor='val_loss',
         verbose=1,
         save_best_only=True)
 
+    # learning-rate changes as the number of epochs increases
     lr_scheduler_call = LearningRateScheduler(schedule=step_decay,
                                               verbose=1)
 

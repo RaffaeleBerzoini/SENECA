@@ -20,6 +20,7 @@ def cba(unet, num_filters=16, kernel_size=(3, 3), activation='relu', padding='sa
 def down_block(unet, num_filters, kernel_size=(3, 3), activation='relu', padding='same', dropout_rate=0.05,
                pool_size=(2, 2), pool_and_drop=True, concatenations=None):
     """
+    Encoding layer
     Convolution - BatchNorm - Activation - Max Pooling - Dropout
     """
     if concatenations is None:
@@ -38,6 +39,7 @@ def down_block(unet, num_filters, kernel_size=(3, 3), activation='relu', padding
 
 def up_block(unet, num_filters, concatenations, kernel_size=(3, 3), activation='relu', strides=(2, 2), padding='same',
              dropout_rate=0.05):
+    """Decoding layer"""
     unet = layers.Conv2DTranspose(num_filters, kernel_size, strides=strides, padding=padding)(unet)
     unet = layers.concatenate([unet, concatenations.pop()])
     unet = layers.Dropout(rate=dropout_rate)(unet)
@@ -48,6 +50,15 @@ def up_block(unet, num_filters, concatenations, kernel_size=(3, 3), activation='
 
 
 def get_model(img_size, num_classes, batch_size, num_layers=4, num_filters=16):
+    """
+    @param img_size: dimension of images fed to the Net
+    @param num_classes: number of classes present in the dataset
+    @param batch_size: number of slices in each batch
+    @param num_layers: number of layers of the encoding and decoding path.
+    @param num_filters: Number of filters of first encoding layer. This number is doubled for each encoding layer
+    and halved for each decoding layer
+    @return: A U-Net will have 2*num_layers + 1 layers
+    """
     inputs = keras.Input(shape=img_size + (1,), batch_size=batch_size)  # (img_h, img_w, 1)
     unet = inputs
     LAYERS = num_layers

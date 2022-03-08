@@ -37,7 +37,7 @@ DIVIDER = '-----------------------------------------'
 
 def evaluate_model(model, dataset, quantized=False):
     """
-    Evaluate quantized model
+    Evaluate quantized model to check performance losses after quantization
     """
     print('\n' + DIVIDER)
     if quantized is True:
@@ -89,17 +89,21 @@ def quant_model(float_model, quant_model, batchsize, imgsize, evaluate, calibrat
     width = float_model.input_shape[2]
 
     # Instance of the dataset via keras.utils.Sequence
-    dataset_utils.cal_samples = calibration_dimension
+    dataset_utils.cal_samples = calibration_dimension  # set desired number of images for calibration dataset
     quant_dataset = get_DataGen(train=False, batch_size=batchsize, calibration=True)
 
     # run quantization
     quantizer = vitis_quantize.VitisQuantizer(float_model)
 
     if not FFT:
-        quantized_model = quantizer.quantize_model(calib_dataset=quant_dataset, verbose=1)
+        quantized_model = quantizer.quantize_model(calib_dataset=quant_dataset,
+                                                   verbose=1)  # PQT: faster and with less memory required -> larger
+        # calibration dataset can be used
     else:
         quantized_model = quantizer.quantize_model(calib_dataset=quant_dataset, verbose=1, include_fast_ft=True,
-                                                   fast_ft_epochs=FFT_epochs)
+                                                   fast_ft_epochs=FFT_epochs)  # FFT: to be used when PQT causes
+        # non-negligible performance losses.
+        # More memory needed as FFT_epochs and calibration dimension increase
 
     # saved quantized model
     quantized_model.save(quant_model)
@@ -122,8 +126,10 @@ def main():
     ap.add_argument('-b', '--batchsize', type=int, default=8, help='Batchsize for quantization. Default is 8')
     ap.add_argument('-c', '--calibration', type=int, default=500, help='Dimension of the calibration dataset. Default '
                                                                        'is 500')
-    ap.add_argument('-fft', '--fastfinetuning', action='store_true', help='Perform fast fine tuning. Use the --fftEpochs arg to set FFT epochs. Default is False')
-    ap.add_argument('-ffte', '--fftepochs', type=int, default=10, help='Set how many iteration are performed for each layer weights tuning. Default is 10')
+    ap.add_argument('-fft', '--fastfinetuning', action='store_true',
+                    help='Perform fast fine tuning. Use the --fftEpochs arg to set FFT epochs. Default is False')
+    ap.add_argument('-ffte', '--fftepochs', type=int, default=10,
+                    help='Set how many iteration are performed for each layer weights tuning. Default is 10')
     ap.add_argument('-d', '--imgsize', type=int, default=256, help='Dimension for data generator. Default is 256')
     ap.add_argument('-e', '--evaluate', action='store_true',
                     help='Evaluate floating-point model if set. Default is no evaluation.')
@@ -144,7 +150,8 @@ def main():
     print(' --evaluate       : ', args.evaluate)
     print('------------------------------------\n')
 
-    quant_model(args.float_model, args.quant_model, args.batchsize, args.imgsize, args.evaluate, args.calibration, args.fastfinetuning, args.fftepochs)
+    quant_model(args.float_model, args.quant_model, args.batchsize, args.imgsize, args.evaluate, args.calibration,
+                args.fastfinetuning, args.fftepochs)
 
 
 if __name__ == "__main__":

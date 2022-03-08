@@ -2,6 +2,8 @@ import argparse
 
 from dataset_utils import prepare_target_images
 
+"""Utility file to prepare input images and labels for the FPGA board"""
+
 ap = argparse.ArgumentParser()
 ap.add_argument('-s', '--start', type=int, default=0, help='Starting image in the images list')
 ap.add_argument('-nim', '--numimages', type=int, default=1000, help='Number of images to be prepared for the FPGA')

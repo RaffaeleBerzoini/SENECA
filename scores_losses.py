@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import backend as K
 
+"""Utility file for loss and dice scores function. Used during floating point U-Net training"""
+
 epsilon = 1e-5
 smooth = 1
 alpha = 0.7
@@ -56,6 +58,7 @@ def tversky_bones(y_true, y_pred, num_channel=5):
 # 4 kidneys
 # 5 bones
 
+# Empirical weights used for a more balanced training between organs with different frequency
 background_w = 0.0
 liver_w = 1.15
 bladder_w = 1.95
@@ -77,8 +80,6 @@ def foc_tversky_loss(y_true, y_pred):
     gamma = 4.0 / 3.0
     return K.pow((1 - pt_2), gamma)
 
-
-# averaging across batch axis, 0-dimension:
 
 def dice_background(y_true, y_pred, smooth=1, num_class=0):
     intersection = K.sum(y_true[:, :, :, num_class] * y_pred[:, :, :, num_class])
@@ -123,7 +124,9 @@ def dice_bones(y_true, y_pred, smooth=1, num_class=5):
 # 4 kidneys
 # 5 bone
 
-# Weights have been extracted by counting how many pixels of each organ were present in the dataset
+# Weights have been extracted by counting how many pixels of each organ were present in the whole dataset Weights are
+# not computed at runtime just for training time purposes. The evaluate.py script compute the exacts weights for the
+# evaluated dataset
 def dice(y_true, y_pred, smooth=1):
     return ((0.23212333520332026 * dice_liver(y_true, y_pred) + 0.04549370195613813 * dice_bladder(y_true, y_pred)
              + 0.37348887454707363 * dice_lungs(y_true, y_pred) + 0.05246318852416101 * dice_kidneys(y_true, y_pred)
@@ -134,5 +137,4 @@ def dice(y_true, y_pred, smooth=1):
 
 def dice_loss(y_true, y_pred):
     y_true = K.cast(y_true, 'float32')
-    return (1 - dice(y_true, y_pred))
-
+    return 1 - dice(y_true, y_pred)

@@ -31,17 +31,11 @@ divider = '------------------------------------'
 
 
 def preprocess_fn(image_path, fix_scale):
-    '''
-    Image pre-processing.
-    Rearranges from BGR to RGB then normalizes to range 0:1
-    and then scales by input quantization scaling factor
-    input arg: path of image file
-    return: numpy array
-    '''
+    """
+    Image preprocessing. Convert float32 images into int8 images and scale them by a fix_scale factor
+    @return: the compiled .xmodel ready input image
+    """
     image = np.load(image_path)
-    # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    # image = image + 1  # uncomment here
-    # image = image / 2  # uncomment here
     image = image * fix_scale
     image = image.astype(np.int8)
     return image
@@ -63,15 +57,12 @@ def get_child_subgraph_dpu(graph: "Graph") -> List["Subgraph"]:
 
 
 def runDPU(id, start, dpu, img):
+    """Single thread .xmodel inference process"""
     '''get tensor'''
     inputTensors = dpu.get_input_tensors()
     outputTensors = dpu.get_output_tensors()
     input_ndim = tuple(inputTensors[0].dims)
     output_ndim = tuple(outputTensors[0].dims)
-
-    # we can avoid output scaling if use argmax instead of softmax
-    # output_fixpos = outputTensors[0].get_attr("fix_point")
-    # output_scale = 1 / (2**output_fixpos)
 
     batchSize = input_ndim[0]
     n_of_images = len(img)
@@ -96,8 +87,7 @@ def runDPU(id, start, dpu, img):
         for j in range(runSize):
             imageRun = inputData[0]
             imageRun[j, ...] = img[(count + j) % n_of_images].reshape(input_ndim[1:])
-            # if j == 0:
-            #    print(imageRun.shape)
+
         '''run with batch '''
         job_id = dpu.execute_async(inputData, outputData[len(ids)])
         ids.append((job_id, runSize, start + count))
@@ -110,19 +100,17 @@ def runDPU(id, start, dpu, img):
             write_index = ids[index][2]
             '''store output vectors '''
             for j in range(ids[index][1]):
-                # we can avoid output scaling if use argmax instead of softmax
-                # out_q[write_index] = np.argmax(outputData[0][j] * output_scale)
-                out_q[write_index] = outputData[index][0][j]  # np.argmax(outputData[index][0][j])
+                out_q[write_index] = outputData[index][0][j]
                 write_index += 1
         ids = []
 
 
 def app(image_dir, threads, model, save):
+    """Runs the n-threads inference process"""
     listimage = os.listdir(image_dir)
 
     listimage = sorted(listimage)
     listimage = listimage[:]
-    # print(listimage[:15])
     runTotal = len(listimage)
 
     global out_q
@@ -145,7 +133,6 @@ def app(image_dir, threads, model, save):
     for i in range(runTotal):
         path = os.path.join(image_dir, listimage[i])
         img.append(preprocess_fn(path, input_scale))
-        # target.append(cv2.imread(os.path.join(label_dir, listlabel[i]), 0))
 
     '''run threads '''
     print('Starting', threads, 'threads...')

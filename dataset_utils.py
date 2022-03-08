@@ -1,3 +1,7 @@
+'''
+Utility file to manage batch generator for training and prepare input and labels to test on the FPGA board
+'''
+
 import os
 import sys
 import random
@@ -6,6 +10,7 @@ import numpy as np
 from tensorflow import keras
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
+# directory where slices of all volumes are stored
 target_dir = "build/dataset/target"
 input_dir = "build/dataset/input"
 extension = ".npy"
@@ -50,6 +55,13 @@ assert len(val_input_img_paths) == len(val_target_img_paths)
 
 
 def explode_img(img, num_classes, img_size):
+    """
+    @param img: numpy array image to be transformed in a binary (n,n,num_classes) volume
+    @param num_classes: the number of labels present in the dataset
+    @param img_size: firsts two dimensions of the output 3D volume
+    @return: A binary n by n by num_classes volume where img[:, :, class_i] is equal to 1 where pixel of the i-th
+    class are present
+    """
     exploded = np.zeros(shape=img_size + (num_classes,), dtype=np.uint8)
     for i in range(num_classes):
         exploded[:, :, i] = (img[:, :, 0] == i).astype(np.uint8)
@@ -82,11 +94,22 @@ class DataGen(keras.utils.Sequence):
         for j, path in enumerate(batch_target_img_paths):
             img = load_img(path, target_size=self.img_size, color_mode="grayscale")
             img = keras.preprocessing.image.img_to_array(img)
-            y[j] = explode_img(img, self.num_classes, self.img_size)
+            y[j] = explode_img(img, self.num_classes, self.img_size)  # the labels are presented as a binary volume
         return x, y
 
 
 def get_DataGen(train=True, batch_size=64, img_size=(256, 256), calibration=False):
+    """
+    Return a train-set or a validation-set or a calibration-set batches generator
+    @param train: True if data for training is needed. Default is True
+    @param batch_size: number of images per batch.
+    Default is 64
+    @param img_size: dimension of a single image. Default (256, 256)
+    @param calibration: True if
+    calibration dataset is needed. Default is False
+    @return: train-set if train is True and calibration False.
+    Calibration-set if calibration is True and validation dataset if both are False
+    """
     if calibration is True:
         cal_input_img_paths = input_img_paths[-cal_samples:]
         cal_target_img_paths = target_img_paths[-cal_samples:]
@@ -97,6 +120,11 @@ def get_DataGen(train=True, batch_size=64, img_size=(256, 256), calibration=Fals
 
 
 def prepare_target_images(start=0, num_images=1000):
+    """
+    Prepare directory with input and labels for evaluation on the board
+    @param start: index of the first image to copy in the target folders
+    @param num_images: number of images to include in both input and labels folders
+    """
     os.makedirs('build/target/images', exist_ok=False)
     os.makedirs('build/target/labels', exist_ok=False)
     assert num_images <= len(val_input_img_paths)
