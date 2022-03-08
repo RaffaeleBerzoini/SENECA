@@ -1,9 +1,12 @@
-build/
+build/*
 Tars-ng.zip
 .idea/
 __pycache__/
 original_data/
 papers/
+results/
 results/article_utilities/
 application/labels
 application/predictions
+preprocessing/OrganSegmentations/
+todo.txt

@@ -15,6 +15,7 @@ from scores_losses import foc_tversky_loss, dice, dice_liver, \
     dice_bladder, dice_lungs, dice_kidneys, dice_bones
 from model import get_model
 from dataset_utils import get_DataGen
+from GPU_MEMORY import MAX_MEM
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
@@ -22,7 +23,7 @@ if gpus:
     try:
         tf.config.experimental.set_virtual_device_configuration(
             gpus[0],
-            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4000)])
+            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=MAX_MEM)])
         logical_gpus = tf.config.experimental.list_logical_devices('GPU')
         print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
     except RuntimeError as e:
@@ -32,7 +33,7 @@ if gpus:
 DIVIDER = '-----------------------------------------'
 
 
-def train(learnrate, epochs, batch_size, chkpt_dir, tboard, logdir, old_model, starting_epoch):
+def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, logdir, old_model, starting_epoch):
     def step_decay(epoch):
         """
         Learning rate scheduler used by callback
@@ -71,8 +72,8 @@ def train(learnrate, epochs, batch_size, chkpt_dir, tboard, logdir, old_model, s
                                                       'dice_kidneys': dice_kidneys,
                                                       'dice_bones': dice_bones})
     else:
-        model = get_model(img_size=img_size, num_classes=num_classes, batch_size=batch_size, num_layers=4,
-                          num_filters=8)
+        model = get_model(img_size=img_size, num_classes=num_classes, batch_size=batch_size, num_layers=layers,
+                          num_filters=filters)
         model.compile(optimizer=Adam(learning_rate=learnrate),
                       loss=foc_tversky_loss,
                       metrics=[dice, dice_liver, dice_bladder, dice_lungs, dice_kidneys,
@@ -124,11 +125,11 @@ def train(learnrate, epochs, batch_size, chkpt_dir, tboard, logdir, old_model, s
     os.makedirs(chkpt_dir, exist_ok=True)  # does not raise an error if the directory already exists
 
     # run training
-    train_history = model.fit(train_dataset,
-                              epochs=epochs,
-                              validation_data=val_dataset,
-                              callbacks=callbacks_list,
-                              verbose=1)
+    model.fit(train_dataset,
+              epochs=epochs,
+              validation_data=val_dataset,
+              callbacks=callbacks_list,
+              verbose=1)
 
     print(
         "\nTensorBoard can be opened with the command: tensorboard --logdir={dir} --host localhost --port 6006".format(
@@ -140,8 +141,13 @@ def train(learnrate, epochs, batch_size, chkpt_dir, tboard, logdir, old_model, s
 def run_main():
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument('-b', '--batchsize', type=int, default=64,
-                    help='Training batchsize. Must be an integer. Default is 64.')
+    ap.add_argument('-b', '--batchsize', type=int, default=8,
+                    help='Training batchsize. Must be an integer. Default is 8.')
+    ap.add_argument('-l', '--layers', type=int, default=4,
+                    help='Number of layers for the U-Net. Number considers only the encoding path. Must be an '
+                         'integer. Default is 4')
+    ap.add_argument('-f', '--filters', type=int, default=8,
+                    help='Number of filters for the U-Net. Must be an integer. Default is 8')
     ap.add_argument('-e', '--epochs', type=int, default=5,
                     help='number of training epochs. Must be an integer. Default is 5.')
     ap.add_argument('-lr', '--learnrate', type=float, default=0.001,
@@ -155,7 +161,8 @@ def run_main():
     ap.add_argument('-m', '--model', type=str, default=None,
                     help='Model to load to continue the training. Default is None')
     ap.add_argument('-se', '--start_epoch', type=int, default=0,
-                    help='Number of epoch we are starting from to keep consistent learning rate and epoch saving. Default is 0')
+                    help='Number of epoch we are starting from to keep consistent learning rate and epoch saving. '
+                         'Default is 0')
     args = ap.parse_args()
 
     print('\n' + DIVIDER)
@@ -165,6 +172,8 @@ def run_main():
     print(DIVIDER)
     print(' Command line options:')
     print('--batchsize    : ', args.batchsize)
+    print('--layers       : ', args.layers)
+    print('--filters      : ', args.filters)
     print('--learnrate    : ', args.learnrate)
     print('--epochs       : ', args.epochs)
     print('--chkpt_dir    : ', args.chkpt_dir)
@@ -174,8 +183,8 @@ def run_main():
     print('--start_epoch  : ', args.start_epoch)
     print(DIVIDER)
 
-    train(args.learnrate, args.epochs, args.batchsize, args.chkpt_dir, args.tboard, args.logdir, args.model,
-          args.start_epoch)
+    train(args.learnrate, args.epochs, args.batchsize, args.layers, args.filters, args.chkpt_dir, args.tboard,
+          args.logdir, args.model, args.start_epoch)
 
 
 if __name__ == '__main__':

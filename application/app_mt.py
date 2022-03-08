@@ -23,9 +23,12 @@ import threading
 import time
 import sys
 import argparse
-#from scores import f1_score
+import shutil
+
+# from scores import f1_score
 
 divider = '------------------------------------'
+
 
 def preprocess_fn(image_path, fix_scale):
     '''
@@ -59,7 +62,7 @@ def get_child_subgraph_dpu(graph: "Graph") -> List["Subgraph"]:
     ]
 
 
-def runDPU(id,start,dpu,img):
+def runDPU(id, start, dpu, img):
     '''get tensor'''
     inputTensors = dpu.get_input_tensors()
     outputTensors = dpu.get_output_tensors()
@@ -67,23 +70,23 @@ def runDPU(id,start,dpu,img):
     output_ndim = tuple(outputTensors[0].dims)
 
     # we can avoid output scaling if use argmax instead of softmax
-    #output_fixpos = outputTensors[0].get_attr("fix_point")
-    #output_scale = 1 / (2**output_fixpos)
+    # output_fixpos = outputTensors[0].get_attr("fix_point")
+    # output_scale = 1 / (2**output_fixpos)
 
     batchSize = input_ndim[0]
     n_of_images = len(img)
     count = 0
     write_index = start
-    ids=[]
+    ids = []
     ids_max = 50
     outputData = []
     for i in range(ids_max):
         outputData.append([np.empty(output_ndim, dtype=np.int8, order="C")])
     while count < n_of_images:
-        if (count+batchSize<=n_of_images):
+        if (count + batchSize <= n_of_images):
             runSize = batchSize
         else:
-            runSize=n_of_images-count
+            runSize = n_of_images - count
 
         '''prepare batch input/output '''
         inputData = []
@@ -93,14 +96,14 @@ def runDPU(id,start,dpu,img):
         for j in range(runSize):
             imageRun = inputData[0]
             imageRun[j, ...] = img[(count + j) % n_of_images].reshape(input_ndim[1:])
-            #if j == 0:
+            # if j == 0:
             #    print(imageRun.shape)
         '''run with batch '''
-        job_id = dpu.execute_async(inputData,outputData[len(ids)])
-        ids.append((job_id,runSize,start+count))
-        count = count + runSize 
-        if count<n_of_images:
-            if len(ids) < ids_max-1:
+        job_id = dpu.execute_async(inputData, outputData[len(ids)])
+        ids.append((job_id, runSize, start + count))
+        count = count + runSize
+        if count < n_of_images:
+            if len(ids) < ids_max - 1:
                 continue
         for index in range(len(ids)):
             dpu.wait(ids[index][0])
@@ -109,18 +112,17 @@ def runDPU(id,start,dpu,img):
             for j in range(ids[index][1]):
                 # we can avoid output scaling if use argmax instead of softmax
                 # out_q[write_index] = np.argmax(outputData[0][j] * output_scale)
-                out_q[write_index] = outputData[index][0][j]#np.argmax(outputData[index][0][j])
+                out_q[write_index] = outputData[index][0][j]  # np.argmax(outputData[index][0][j])
                 write_index += 1
-        ids=[]
+        ids = []
 
 
-def app(image_dir,threads,model, save):
-
-    listimage=os.listdir(image_dir)
+def app(image_dir, threads, model, save):
+    listimage = os.listdir(image_dir)
 
     listimage = sorted(listimage)
-    listimage = listimage[:] 
-    #print(listimage[:15]) 
+    listimage = listimage[:]
+    # print(listimage[:15])
     runTotal = len(listimage)
 
     global out_q
@@ -133,31 +135,31 @@ def app(image_dir,threads,model, save):
 
     # input scaling
     input_fixpos = all_dpu_runners[0].get_input_tensors()[0].get_attr("fix_point")
-    input_scale = 2**input_fixpos
+    input_scale = 2 ** input_fixpos
 
     ''' preprocess images '''
-    print (divider)
-    print('Pre-processing',runTotal,'images...')
+    print(divider)
+    print('Pre-processing', runTotal, 'images...')
     img = []
     target = []
     for i in range(runTotal):
         path = os.path.join(image_dir, listimage[i])
         img.append(preprocess_fn(path, input_scale))
-        #target.append(cv2.imread(os.path.join(label_dir, listlabel[i]), 0))
+        # target.append(cv2.imread(os.path.join(label_dir, listlabel[i]), 0))
 
     '''run threads '''
-    print('Starting',threads,'threads...')
+    print('Starting', threads, 'threads...')
     threadAll = []
-    start=0
+    start = 0
     for i in range(threads):
-        if (i==threads-1):
+        if (i == threads - 1):
             end = len(img)
         else:
-            end = start+(len(img)//threads)
+            end = start + (len(img) // threads)
         in_q = img[start:end]
-        t1 = threading.Thread(target=runDPU, args=(i,start,all_dpu_runners[i], in_q))
+        t1 = threading.Thread(target=runDPU, args=(i, start, all_dpu_runners[i], in_q))
         threadAll.append(t1)
-        start=end
+        start = end
 
     time1 = time.time()
     for x in threadAll:
@@ -168,45 +170,47 @@ def app(image_dir,threads,model, save):
     timetotal = time2 - time1
 
     fps = float(runTotal / timetotal)
-    print (divider)
-    print("Throughput=%.2f fps, total frames = %.0f, time=%.4f seconds" %(fps, runTotal, timetotal))
-
+    print(divider)
+    print("Throughput=%.2f fps, total frames = %.0f, time=%.4f seconds" % (fps, runTotal, timetotal))
 
     ''' post-processing '''
     if save is True:
-        print('Saving ',len(out_q),' predictions...')
+        print('Saving ', len(out_q), ' predictions...')
+        try:
+            shutil.rmtree('predictions/')
+        except:
+            pass
         os.makedirs('predictions', exist_ok=True)
         assert len(listimage) == len(out_q)
-        for i in range(len(out_q)):        
+        for i in range(len(out_q)):
             filename = 'pred_' + listimage[i]
-            np.save('predictions/'+filename, out_q[i])
-        
-    print (divider)
-    
-    return
+            np.save('predictions/' + filename, out_q[i])
 
+    print(divider)
+
+    return
 
 
 # only used if script is run as 'main' from command line
 def main():
+    # construct the argument parser and parse the arguments
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-d', '--image_dir', type=str, default='images', help='Path to folder of images. Default is images')
+    ap.add_argument('-t', '--threads', type=int, default=1, help='Number of threads. Default is 1')
+    ap.add_argument('-m', '--model', type=str, default='bionet.xmodel',
+                    help='Path of xmodel. Default is customcnn.xmodel')
+    ap.add_argument('-s', '--save', action='store_true',
+                    help='Save predictions to directory predictions/ . Default is False')
+    args = ap.parse_args()
 
-  # construct the argument parser and parse the arguments
-  ap = argparse.ArgumentParser()  
-  ap.add_argument('-d', '--image_dir', type=str, default='images', help='Path to folder of images. Default is images')  
-  ap.add_argument('-t', '--threads',   type=int, default=1,        help='Number of threads. Default is 1')
-  ap.add_argument('-m', '--model',     type=str, default='bionet.xmodel', help='Path of xmodel. Default is customcnn.xmodel')
-  ap.add_argument('-s', '--save',      action='store_true', help='Save predictions to directory predictions/ . Default is False')
-  args = ap.parse_args()
-  
-  print ('Command line options:')
-  print (' --image_dir : ', args.image_dir)
-  print (' --threads   : ', args.threads)
-  print (' --model     : ', args.model)
-  print (' --save      : ', args.save)
-  
+    print('Command line options:')
+    print(' --image_dir : ', args.image_dir)
+    print(' --threads   : ', args.threads)
+    print(' --model     : ', args.model)
+    print(' --save      : ', args.save)
 
-  app(args.image_dir,args.threads,args.model, args.save)
+    app(args.image_dir, args.threads, args.model, args.save)
+
 
 if __name__ == '__main__':
-  main()
-
+    main()
