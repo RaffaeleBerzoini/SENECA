@@ -188,3 +188,14 @@ Bones: 94.35 +- 0.03
 ```
 
 The script prints out also other for a more complete analysis
+
+
+### Credits and contributions:
+
+- ####  Raffaele Berzoini <br> raffaele.berzoini@mail.polimi.it
+- ####  Eleonora D'Arnese  <br> eleonora.darnese@polimi.it
+- ####  Davide Conficconi  <br> davide.conficconi@polimi.it
+- #### Marco D. Santambrogio <br> marco.santambrogio@polimi.it
+
+
+
