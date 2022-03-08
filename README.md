@@ -95,7 +95,7 @@ to train the 1 million parameters model. To test other configurations reported o
 |         8M        |      5     |      11     |         ~ 7.814         |
 |        16M        |      5     |      16     |         ~ 16.522        |
 
-During training, each time validation results imporve, a float model is saved in:
+During training, each time validation results improve, a float model is saved in:
 `build/float_model/{val_loss:.4f}-f_model.h5`
 
 ## Quantization
@@ -108,7 +108,7 @@ Note that here `0.1021-f_model.h5` is just an example. Check in your `build/floa
 
 * The quantization model is stored in `build/quant_model/q_model.h5`.
 * You would want to try different calibration dimensions if there is a lot of performance loss after quantization
-* To eventually perform Fast Fine Tuning (FFT) execute:
+* To eventually perform Fast FineTuning (FFT) execute:
 
 ```console
 python quantize.py -m build/float_model/0.1442-f_model.h5 --evaluate --calibration 100 --fastfinetuning --fftepochs 5
@@ -129,7 +129,7 @@ For the ZCU104 (used for this work) the compiled model is saved in `build/compil
 
 ## Deployment on the evaluation board
 
-Setup the evaluation board (we used the ZCU104 for this work) as stated [here](https://docs.xilinx.com/r/en-US/ug1414-vitis-ai/Setting-Up-the-Evaluation-Board).
+Set up the evaluation board (we used the ZCU104 for this work) as stated [here](https://docs.xilinx.com/r/en-US/ug1414-vitis-ai/Setting-Up-the-Evaluation-Board).
 
 
 In the WRK_DIR execute:
