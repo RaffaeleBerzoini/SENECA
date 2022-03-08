@@ -7,7 +7,7 @@
     ```console
     git clone https://github.com/Xilinx/Vitis-AI.git
     cd Vitis-AI
-    git checkout
+    git checkout 1.4.1
     ```
 * Follow the Vitis-AI installation process [here](https://github.com/Xilinx/Vitis-AI/blob/master/README.md) 
   * Once the installation is completed open a terminal in the Vitis-AI directory and execute:  
@@ -195,7 +195,7 @@ The script prints out also other for a more complete analysis
 - ####  Raffaele Berzoini <br> raffaele.berzoini@mail.polimi.it
 - ####  Eleonora D'Arnese  <br> eleonora.darnese@polimi.it
 - ####  Davide Conficconi  <br> davide.conficconi@polimi.it
-- #### Marco D. Santambrogio <br> marco.santambrogio@polimi.it
+- ####  Marco D. Santambrogio <br> marco.santambrogio@polimi.it
 
 
 
