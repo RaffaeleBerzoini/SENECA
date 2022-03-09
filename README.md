@@ -9,7 +9,7 @@
     cd Vitis-AI
     git checkout 1.4.1
     ```
-* Follow the Vitis-AI installation process [here](https://github.com/Xilinx/Vitis-AI/blob/master/README.md) 
+* Follow the Vitis-AI installation process [here](https://docs.xilinx.com/r/en-US/ug1414-vitis-ai/Setting-Up-the-Host) 
   * Once the installation is completed open a terminal in the Vitis-AI directory and execute:  
   ```console
   git clone https://github.com/RaffaeleBerzoini/SENECA.git
@@ -33,9 +33,8 @@ SENECA   # your WRK_DIR
 ```
 
 * Download the [dataset](https://wiki.cancerimagingarchive.net/display/Public/CT-ORG%3A+CT+volumes+with+multiple+organ+segmentations)
-  * Data wil be downloaded in a folder named _OrganSegmentations_
-  * If not rename the folder
-  * Move the _OrganSegmentations_ folder in WRK_DIR/preprocessing. Now the workspace should look like:
+  * Data wil be downloaded in a folder named _OrganSegmentations_. If not rename it
+  * Move the _OrganSegmentations_ folder in `WRK_DIR/preprocessing`. Now the workspace should look like:
 
 ```text
 SENECA   # your WRK_DIR
@@ -100,22 +99,32 @@ During training, each time validation results improve, a float model is saved in
 
 ## Quantization
 
+You can perform Post Training Quantization (PTQ) or Fast Finetuning Quantization (FFQ) to quantize the float model. 
+PTQ is to be preferred in terms of time and computation needs. Try FFQ if you're experiencing performance losses after PTQ
+
+### 1. Post Training Quantization
+
 In the WRK_DIR execute:
   ```console
 python quantize.py -m build/float_model/0.1021-f_model.h5 --evaluate --calibration 500
   ```
-Note that here `0.1021-f_model.h5` is just an example. Check in your `build/float_model/` which float models have been generated during training.
-
-* The quantization model is stored in `build/quant_model/q_model.h5`.
 * You would want to try different calibration dimensions if there is a lot of performance loss after quantization
-* To eventually perform Fast FineTuning (FFT) execute:
+
+### 2. Fast Finetuning Quantization
+
+In the WRK_DIR execute:
 
 ```console
-python quantize.py -m build/float_model/0.1442-f_model.h5 --evaluate --calibration 100 --fastfinetuning --fftepochs 5
+python quantize.py -m build/float_model/0.1021-f_model.h5 --evaluate --calibration 100 --fastfinetuning --fftepochs 5
 ```
 
 * Modify the `fast_ft_epochs` as you like
 * Keep in mind that FFT requires more memory as you increase the calibration dataset dimensions and the number of FFT epochs
+
+
+Note that here `0.1021-f_model.h5` is just an example. Check in your `build/float_model/` directory which float models have been generated during training.
+
+* The quantized model is saved in `build/quant_model/q_model.h5`.
 
 ## Compilation
 
@@ -187,7 +196,7 @@ Kidneys: 81.32 +- 0.08
 Bones: 94.35 +- 0.03
 ```
 
-The script prints out also other for a more complete analysis
+The script prints out also other metrics for a more complete analysis.
 
 
 ### Credits and contributions:
