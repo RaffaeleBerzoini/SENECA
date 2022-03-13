@@ -198,13 +198,16 @@ Bones: 94.35 +- 0.03
 
 The script prints out also other metrics for a more complete analysis.
 
+<a id="paper_ref"></a>
+# Associated Publication
 
-### Credits and contributions:
+If you find this repository useful, please use the following citation:
 
-- ####  Raffaele Berzoini <br> raffaele.berzoini@mail.polimi.it
-- ####  Eleonora D'Arnese  <br> eleonora.darnese@polimi.it
-- ####  Davide Conficconi  <br> davide.conficconi@polimi.it
-- ####  Marco D. Santambrogio <br> marco.santambrogio@polimi.it
-
-
-
+```
+@inproceedings{berzoini2021onhow,
+  title={On How to Push Efficient Medical Semantic Segmentation to the Edge: the SENECA approach},
+  author={Berzoini, Raffaele and D'Arnese, Eleonora and Conficconi, Davide and Santambrogio, Marco D},
+  booktitle={2022 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)},
+  year={2022},
+  organization={IEEE}
+}
