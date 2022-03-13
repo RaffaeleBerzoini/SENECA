@@ -206,7 +206,7 @@ If you find this repository useful, please use the following citation:
 ```
 @inproceedings{berzoini2021onhow,
   title={On How to Push Efficient Medical Semantic Segmentation to the Edge: the SENECA approach},
-  author={Berzoini, Raffaele and D'Arnese, Eleonora and Conficconi, Davide and Santambrogio, Marco D},
+  author={Berzoini, Raffaele and D'Arnese, Eleonora and Conficconi, Davide},
   booktitle={2022 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)},
   year={2022},
   organization={IEEE}
