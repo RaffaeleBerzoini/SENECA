@@ -11,3 +11,5 @@ application/labels
 application/predictions
 preprocessing/OrganSegmentations/
 todo.txt
+preprocessing/histograms/
+train_log.csv

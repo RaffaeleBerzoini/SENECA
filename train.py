@@ -83,7 +83,7 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
     Define the model
     '''
 
-    img_size = (256, 256)
+    img_size = (512, 512)
     num_classes = 6
 
     """Loads float-model to continue training"""

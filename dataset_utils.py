@@ -43,7 +43,7 @@ input_img_paths = sorted(
     [
         os.path.join(input_dir, fname)
         for fname in os.listdir(input_dir)
-        if fname.endswith(extension)
+        if fname.endswith(extension) and int(fname.split(sep='-')[0]) > 20
     ]
 )
 
@@ -51,7 +51,23 @@ target_img_paths = sorted(
     [
         os.path.join(target_dir, fname)
         for fname in os.listdir(target_dir)
-        if fname.endswith(".bmp")
+        if fname.endswith(".npy") and int(fname.split(sep='-')[0]) > 20
+    ]
+)
+
+input_test_img_paths = sorted(
+    [
+        os.path.join(input_dir, fname)
+        for fname in os.listdir(input_dir)
+        if fname.endswith(extension) and int(fname.split(sep='-')[0]) <= 20
+    ]
+)
+
+target_test_img_paths = sorted(
+    [
+        os.path.join(target_dir, fname)
+        for fname in os.listdir(target_dir)
+        if fname.endswith(".npy") and int(fname.split(sep='-')[0]) <= 20
     ]
 )
 
@@ -60,6 +76,12 @@ target_img_paths = sorted(
 # print("Number of samples:", len(target_img_paths))
 # for input_path, target_path in zip(input_img_paths[-10:], target_img_paths[-10:]):
 #     print(input_path, "|", target_path)
+
+for input_path, target_path in zip(input_img_paths, target_img_paths):
+    assert os.path.basename(input_path) == os.path.basename(target_path)
+
+for input_path, target_path in zip(input_test_img_paths, target_test_img_paths):
+    assert os.path.basename(input_path) == os.path.basename(target_path)
 
 random.Random(1337).shuffle(input_img_paths)
 random.Random(1337).shuffle(target_img_paths)
@@ -86,7 +108,7 @@ def explode_img(img, num_classes, img_size):
     """
     exploded = np.zeros(shape=img_size + (num_classes,), dtype=np.uint8)
     for i in range(num_classes):
-        exploded[:, :, i] = (img[:, :, 0] == i).astype(np.uint8)
+        exploded[:, :, i] = (img[:, :] == i).astype(np.uint8)
     return exploded
 
 
@@ -114,8 +136,7 @@ class DataGen(keras.utils.Sequence):
             x[j] = np.expand_dims(img, 2)
         y = np.zeros((self.batch_size,) + self.img_size + (self.num_classes,), dtype="uint8")
         for j, path in enumerate(batch_target_img_paths):
-            img = load_img(path, target_size=self.img_size, color_mode="grayscale")
-            img = keras.preprocessing.image.img_to_array(img)
+            img = np.load(path)
             y[j] = explode_img(img, self.num_classes, self.img_size)  # the labels are presented as a binary volume
         return x, y
 
