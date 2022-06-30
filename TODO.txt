@@ -1,0 +1,1 @@
+For PYNQ-DPU deployment_setup.sh is no more valid

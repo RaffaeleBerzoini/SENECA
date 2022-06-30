@@ -86,6 +86,9 @@ for input_path, target_path in zip(input_test_img_paths, target_test_img_paths):
 random.Random(1337).shuffle(input_img_paths)
 random.Random(1337).shuffle(target_img_paths)
 
+random.Random(1337).shuffle(input_test_img_paths)
+random.Random(1337).shuffle(target_test_img_paths)
+
 val_samples = len(input_img_paths) // 5
 
 train_input_img_paths = input_img_paths[:-val_samples]
@@ -175,9 +178,9 @@ def prepare_target_images(start=0, num_images=1000):
     """
     os.makedirs('build/target/images', exist_ok=False)
     os.makedirs('build/target/labels', exist_ok=False)
-    assert num_images <= len(val_input_img_paths)
+    assert num_images + start < len(val_target_img_paths)
     for i in range(start, start + num_images):
-        shutil.copy(val_input_img_paths[i],
-                    'build/target/images/' + os.path.basename(os.path.normpath(val_input_img_paths[i])))
-        shutil.copy(val_target_img_paths[i],
-                    'build/target/labels/' + os.path.basename(os.path.normpath(val_target_img_paths[i])))
+        shutil.copy(input_test_img_paths[i],
+                    'build/target/images/' + os.path.basename(os.path.normpath(input_test_img_paths[i])))
+        shutil.copy(target_test_img_paths[i],
+                    'build/target/labels/' + os.path.basename(os.path.normpath(target_test_img_paths[i])))
