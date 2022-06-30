@@ -31,7 +31,7 @@ same_vox_data_dir = 'OrganSegmentationsSameVoxel/'
 brain_label = 6
 dataset_input_dir = '../build/dataset/input/'
 dataset_target_dir = '../build/dataset/target/'
-new_dim = 256
+new_dim = (256, 256)
 
 
 def gamma_transformation(img, high_in, high_out, low_in, low_out, gamma=3.5):
@@ -83,9 +83,9 @@ def extract_slices():
                 high_out = 1
                 low_out = -1
                 input_slice = gamma_transformation(slice_input, high_in, high_out, low_in, low_out, gamma=1)
-                np.save(dataset_input_dir + f'{i}-{z}.npy', input_slice)
+                np.save(dataset_input_dir + f'{i}-{z}.npy', cv2.resize(input_slice, dsize=new_dim))
                 label = np.rint(label).astype(np.uint8)
-                np.save(dataset_target_dir + f'{i}-{z}.npy', label)
+                np.save(dataset_target_dir + f'{i}-{z}.npy', cv2.resize(label, dsize=new_dim))
                 # print(dataset_input_dir + f'{i}-{z}.npy', ' ', dataset_target_dir + f'{i}-{z}.npy')
 
 
