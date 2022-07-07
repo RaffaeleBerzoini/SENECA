@@ -22,8 +22,7 @@ compile() {
 		        --net_name seneca4ctorg${BOARD}${MODEL}
 }
 
-rm -r xmodel/
-mkdir xmodel/
+mkdir -p xmodel/
 compile 2>&1 | tee build/logs/compile_$TARGET.log
 
 
