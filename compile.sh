@@ -7,19 +7,23 @@ if [ "$#" -eq 2 ]; then
 	MODEL_NAME=$2
 else
 	echo "Error: please provide BOARD and MODEL_NAME as arguments."
-	echo "Example: ./compile.sh KV260 cf_resnet50_imagenet_224_224_7.7G_1.4"
+	echo "Example: ./compile.sh KV260 path/to/quant_model.h5"
 	exit 1
 fi
+
+sudo mkdir -p /opt/vitis_ai/compiler/arch/DPUCZDX8G/Ultra96/
+sudo cp arch.json /opt/vitis_ai/compiler/arch/DPUCZDX8G/Ultra96/
 
 compile() {
       vai_c_tensorflow2 \
             --model           ${MODEL_NAME} \
             --arch /opt/vitis_ai/compiler/arch/DPUCZDX8G/${BOARD}/arch.json \
-		        --output_dir . \
-		        --net_name tf2_${MODEL}
+		        --output_dir ./xmodel \
+		        --net_name seneca4ctorg${BOARD}${MODEL}
 }
 
-
+rm -r xmodel/
+mkdir xmodel/
 compile 2>&1 | tee build/logs/compile_$TARGET.log
 
 
