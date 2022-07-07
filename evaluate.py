@@ -79,6 +79,9 @@ def main():
                                                    'dice_bones': dice_bones})
 
     datagen = get_DataGen4test(batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize))
+    
+    model.evaluate(datagen)
+
     preds = []
     true = []
     for i in range(dataset_utils.get_train_len() // args.batchsize):
