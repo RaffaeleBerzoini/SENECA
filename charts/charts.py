@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# colors = ['#fdd0a2', '#fdae6b', '#41b6c4', '#1d91c0', '#225ea8']
+
 colors = ['#d0d1e6', '#a6bddb', '#74a9cf', '#2b8cbe', '#045a8d']
+
 chart_fnt = 28
 leg_fnt = 24
 tick_fnt = 21
@@ -120,6 +121,8 @@ def runtime_data():
 
     global width
     width = 0.15
+    global colors
+    colors = ['#d0d1e6', '#a6bddb', '#00A341', '#214F4B', '#274C77']
     x_tick_num = 4
     x_label = 'Dataset'
     name = "./JBHI_charts/dataset-watt"
