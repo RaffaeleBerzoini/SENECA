@@ -64,6 +64,63 @@ def plot_runtime(name, dataframe, xlabel, ylabel):
     plt.close(fig)
 
 
+def delta_data():
+    os.makedirs('JBHI_charts/', exist_ok=True)
+
+    # 2060, Tesla, KV260, Ultra96-V2, ZCU104
+    # MobileNetV2 + decoder
+    BraTS_Watt = [28.06, 71.58, 12.39, 8.96, 16.47]
+    BraTS_FPS = [99.98, 372.52, 96.52, 37.26, 93.34]
+    BraTS_EE = [FPS / WATT for FPS, WATT in zip(BraTS_FPS, BraTS_Watt)]
+
+    # vNet
+    PROSTATE3T_Watt = [77.22, 81.82, 11.38, 8.59, 15.96]
+    PROSTATE3T_FPS = [299.62, 599.48, 145.76, 91.47, 190.68]
+    PROSTATE3T_EE = [FPS / WATT for FPS, WATT in zip(PROSTATE3T_FPS, PROSTATE3T_Watt)]
+
+    # U-Net
+    CTORG_Watt = [78.17, 80.38, 12.33, 9.59, 17.59]
+    CTORG_FPS = [72.09, 199.36, 74.70, 36.52, 82.92]
+    CTORG_EE = [FPS / WATT for FPS, WATT in zip(CTORG_FPS, CTORG_Watt)]
+
+    # CNN
+    BCCD_Watt = [80.28, 166.56, 12.75, 9.28, 17.35]
+    BCCD_FPS = [959.50, 2046.22, 237.92, 114.99, 225.49]
+    BCCD_EE = [FPS / WATT for FPS, WATT in zip(BCCD_FPS, BCCD_Watt)]
+
+    dataframe_Watt = pd.DataFrame({'BraTS': BraTS_Watt,
+                                   'PROSTATE3T': PROSTATE3T_Watt,
+                                   'CT-ORG': CTORG_Watt,
+                                   'BCCD': BCCD_Watt})
+
+    dataframe_Watt.index = ['RTX 2060 Mobile', 'Tesla V100', 'Kria KV260', 'Avnet Ultra96-V2', 'ZCU104']
+
+    dataframe_FPS = pd.DataFrame({'BraTS': BraTS_FPS,
+                                  'PROSTATE3T': PROSTATE3T_FPS,
+                                  'CT-ORG': CTORG_FPS,
+                                  'BCCD': BCCD_FPS})
+
+    dataframe_FPS.index = ['RTX 2060 Mobile', 'Tesla V100', 'Kria KV260', 'Avnet Ultra96-V2', 'ZCU104']
+
+    dataframe_EE = pd.DataFrame({'BraTS': BraTS_EE,
+                                 'PROSTATE3T': PROSTATE3T_EE,
+                                 'CT-ORG': CTORG_EE,
+                                 'BCCD': BCCD_EE})
+
+    dataframe_EE.index = ['RTX 2060 Mobile', 'Tesla V100', 'Kria KV260', 'Avnet Ultra96-V2', 'ZCU104']
+
+    for device in dataframe_FPS.index:
+        print('\n', device)
+        print(f'FPS: {np.mean(np.asarray(dataframe_FPS.loc[device])/np.asarray(dataframe_FPS.loc["RTX 2060 Mobile"]))} '
+              f'+- {np.std(np.asarray(dataframe_FPS.loc[device])/np.asarray(dataframe_FPS.loc["RTX 2060 Mobile"]))}')
+        print(
+            f'Watt: {np.mean(np.asarray(dataframe_Watt.loc[device]) / np.asarray(dataframe_Watt.loc["RTX 2060 Mobile"]))} '
+            f'+- {np.std(np.asarray(dataframe_Watt.loc[device]) / np.asarray(dataframe_Watt.loc["RTX 2060 Mobile"]))}')
+        print(
+            f'EE: {np.mean(np.asarray(dataframe_EE.loc[device]) / np.asarray(dataframe_EE.loc["RTX 2060 Mobile"]))} '
+            f'+- {np.std(np.asarray(dataframe_EE.loc[device]) / np.asarray(dataframe_EE.loc["RTX 2060 Mobile"]))}')
+
+
 def runtime_data():
     os.makedirs('JBHI_charts/',exist_ok=True)
 
@@ -135,3 +192,4 @@ def runtime_data():
 
 if __name__ == '__main__':
     runtime_data()
+    delta_data()
