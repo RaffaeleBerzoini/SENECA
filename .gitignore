@@ -13,3 +13,4 @@ todo.txt
 preprocessing/histograms/
 train_log.csv
 xmodel/
+GPU_MEMORY.py
