@@ -149,25 +149,28 @@ def get_DataGen4test(batch_size=8, img_size=(256, 256)):
 def get_train_len():
     return len(input_test_img_paths)
 
-def get_DataGen(train=True, batch_size=64, img_size=(256, 256), calibration=False):
+def get_DataGen(dataset="train", batch_size=64, img_size=(256, 256)):
     """
     Return a train-set or a validation-set or a calibration-set batches generator
-    @param train: True if data for training is needed. Default is True
+    @param dataset: "train", "validation", "calibration", or "test"
     @param batch_size: number of images per batch.
     Default is 64
     @param img_size: dimension of a single image. Default (256, 256)
-    @param calibration: True if
-    calibration dataset is needed. Default is False
     @return: train-set if train is True and calibration False.
     Calibration-set if calibration is True and validation dataset if both are False
     """
-    if calibration is True:
+    if dataset == "train":
+        return DataGen(batch_size, img_size, train_input_img_paths, train_target_img_paths)
+    elif dataset == "validation":
+        return DataGen(batch_size, img_size, val_input_img_paths, val_target_img_paths)
+    elif dataset == "test":
+        return DataGen(batch_size, img_size, input_test_img_paths, target_test_img_paths)
+    elif dataset == "calibration":
         cal_input_img_paths = input_img_paths[-cal_samples:]
         cal_target_img_paths = target_img_paths[-cal_samples:]
         return DataGen(batch_size, img_size, cal_input_img_paths, cal_target_img_paths)
-    if train is True:
-        return DataGen(batch_size, img_size, train_input_img_paths, train_target_img_paths)
-    return DataGen(batch_size, img_size, val_input_img_paths, val_target_img_paths)
+    else:
+        raise ValueError('dataset should be equal to "train", "validation", "calibration", or "test"')
 
 
 def prepare_target_images(start=0, num_images=1000):
