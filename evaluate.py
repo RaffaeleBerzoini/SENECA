@@ -27,7 +27,7 @@ import tensorflow as tf
 import sys
 
 import dataset_utils
-from dataset_utils import get_DataGen, get_DataGen4test, get_train_len
+from dataset_utils import get_DataGen, get_train_len
 from tensorflow.keras.models import load_model
 from scores_losses import foc_tversky_loss, dice, dice_liver, dice_bladder, dice_lungs, \
     dice_kidneys, dice_bones
@@ -78,7 +78,7 @@ def main():
                                                    'dice_kidneys': dice_kidneys,
                                                    'dice_bones': dice_bones})
 
-    datagen = get_DataGen4test(batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize))
+    datagen = get_DataGen(dataset="train", batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize))
     
     model.evaluate(datagen)
 

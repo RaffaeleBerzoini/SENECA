@@ -143,9 +143,6 @@ class DataGen(keras.utils.Sequence):
             y[j] = explode_img(img, self.num_classes, self.img_size)  # the labels are presented as a binary volume
         return x, y
 
-def get_DataGen4test(batch_size=8, img_size=(256, 256)):
-    return DataGen(batch_size, img_size, input_test_img_paths, target_test_img_paths)
-
 def get_train_len():
     return len(input_test_img_paths)
 

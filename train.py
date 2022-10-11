@@ -152,7 +152,7 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
     model.fit(train_dataset,
               epochs=epochs,
               validation_data=val_dataset,
-              validation_freq=3,
+              validation_freq=1,
               callbacks=callbacks_list,
               verbose=1)
 
