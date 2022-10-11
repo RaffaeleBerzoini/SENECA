@@ -28,7 +28,7 @@ from tensorflow.keras.models import Model
 DIVIDER = '-----------------------------------------'
 
 
-def cba(unet, num_filters=16, kernel_size=(3, 3), activation='relu', padding='same'):
+def cba(unet, num_filters=16, kernel_size=(3, 3), activation='elu', padding='same'):
     """
     Convolution - BatchNorm - Activation
     """
@@ -39,7 +39,7 @@ def cba(unet, num_filters=16, kernel_size=(3, 3), activation='relu', padding='sa
     return unet
 
 
-def down_block(unet, num_filters, kernel_size=(3, 3), activation='relu', padding='same', dropout_rate=0.05,
+def down_block(unet, num_filters, kernel_size=(3, 3), activation='elu', padding='same', dropout_rate=0.05,
                pool_size=(2, 2), pool_and_drop=True, concatenations=None):
     """
     Encoding layer
@@ -59,7 +59,7 @@ def down_block(unet, num_filters, kernel_size=(3, 3), activation='relu', padding
     return unet
 
 
-def up_block(unet, num_filters, concatenations, kernel_size=(3, 3), activation='relu', strides=(2, 2), padding='same',
+def up_block(unet, num_filters, concatenations, kernel_size=(3, 3), activation='elu', strides=(2, 2), padding='same',
              dropout_rate=0.05):
     """Decoding layer"""
     unet = layers.Conv2DTranspose(num_filters, kernel_size, strides=strides, padding=padding)(unet)
