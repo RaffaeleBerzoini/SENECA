@@ -78,7 +78,7 @@ def main():
                                                    'dice_kidneys': dice_kidneys,
                                                    'dice_bones': dice_bones})
 
-    datagen = get_DataGen(dataset="train", batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize))
+    datagen = get_DataGen(dataset="test", batch_size=args.batchsize, img_size=(args.imgsize, args.imgsize))
     
     model.evaluate(datagen)
 
