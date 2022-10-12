@@ -129,8 +129,8 @@ Note that here `0.1021-f_model.h5` is just an example. Check in your `build/floa
 ## Compilation
 
 To compile the `q_model.h5` for the FPGA execute one of these command.
-* `sh compile.sh zcu102` for the ZCU102
-* `sh compile.sh zcu104` for the ZCU104
+* `sh compile.sh ZCU102` for the ZCU102
+* `sh compile.sh ZCU104` for the ZCU104
 * `sh compile.sh vck190` for the VCK190 
 * `sh compile.sh u50` for the ALVEO U50
 
