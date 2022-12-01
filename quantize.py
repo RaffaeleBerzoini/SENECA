@@ -112,7 +112,7 @@ def quant_model(float_model, quant_model, batchsize, imgsize, evaluate, calibrat
 
     # Instance of the dataset via keras.utils.Sequence
     dataset_utils.cal_samples = calibration_dimension  # set desired number of images for calibration dataset
-    quant_dataset = get_DataGen(train=False, batch_size=batchsize, calibration=True)
+    quant_dataset = get_DataGen(dataset="calibration", batch_size=batchsize)
 
     # run quantization
     quantizer = vitis_quantize.VitisQuantizer(float_model)
@@ -132,7 +132,7 @@ def quant_model(float_model, quant_model, batchsize, imgsize, evaluate, calibrat
 
     if evaluate:
         evaluate_model(quantized_model,
-                       get_DataGen(train=False, batch_size=batchsize, img_size=imgsize, calibration=False),
+                       get_DataGen(dataset="test", batch_size=batchsize, img_size=imgsize),
                        quantized=True)
 
     return

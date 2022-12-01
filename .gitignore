@@ -5,9 +5,12 @@ Tars-ng.zip
 __pycache__/
 original_data/
 papers/
-results/
 results/article_utilities/
 application/labels
 application/predictions
 preprocessing/OrganSegmentations/
 todo.txt
+preprocessing/histograms/
+train_log.csv
+xmodel/
+GPU_MEMORY.py

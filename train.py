@@ -114,8 +114,8 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
     tf.data pipelines
     '''
     # train and validation batch-generators
-    train_dataset = get_DataGen(train=True, batch_size=batch_size, img_size=img_size)
-    val_dataset = get_DataGen(train=False, batch_size=batch_size, img_size=img_size)
+    train_dataset = get_DataGen(dataset="train", batch_size=batch_size, img_size=img_size)
+    val_dataset = get_DataGen(dataset="test", batch_size=batch_size, img_size=img_size)
 
     '''
     Call backs
@@ -152,6 +152,7 @@ def train(learnrate, epochs, batch_size, layers, filters, chkpt_dir, tboard, log
     model.fit(train_dataset,
               epochs=epochs,
               validation_data=val_dataset,
+              validation_freq=1,
               callbacks=callbacks_list,
               verbose=1)
 
