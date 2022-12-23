@@ -32,7 +32,7 @@ SENECA   # your WRK_DIR
 └── .py files
 ```
 
-* Download the [dataset](https://wiki.cancerimagingarchive.net/display/Public/CT-ORG%3A+CT+volumes+with+multiple+organ+segmentations)
+* Download the [dataset](https://wiki.cancerimagingarchive.net/pages/viewpage.action?pageId=61080890)
   * Data wil be downloaded in a folder named _OrganSegmentations_. If not rename it
   * Move the _OrganSegmentations_ folder in `WRK_DIR/preprocessing`. Now the workspace should look like:
 
